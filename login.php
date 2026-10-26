@@ -122,7 +122,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </a>
 
             <!-- Responsável / Pai -->
-            <a href="#" class="block bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-400 transition-all duration-300 group">
+            <a href="http://localhost/banco-eras-main/login-responsavel.php" class="block bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-emerald-400 transition-all duration-300 group">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-4">
                         <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-2xl shadow-inner">R</div>
@@ -136,7 +136,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </a>
 
             <!-- Professor(a) -->
-            <a href="#" class="block bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-purple-400 transition-all duration-300 group">
+            <a href="http://localhost/banco-eras-main/login-professor.php" class="block bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-purple-400 transition-all duration-300 group">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-4">
                         <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-2xl shadow-inner">P</div>
@@ -150,7 +150,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </a>
 
             <!-- Vendedor / Cantina -->
-            <a href="#" class="block bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-orange-400 transition-all duration-300 group">
+            <a href="http://localhost/banco-eras-main/login-vendedor.php" class="block bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-orange-400 transition-all duration-300 group">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-4">
                         <div class="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-2xl shadow-inner">V</div>
@@ -164,7 +164,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </a>
 
             <!-- Escola / Gestão -->
-            <a href="#" class="block bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-400 transition-all duration-300 group">
+            <a href="http://localhost/banco-eras-main/login-escola.php" class="block bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-indigo-400 transition-all duration-300 group">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-4">
                         <div class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-2xl shadow-inner">ES</div>
