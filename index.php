@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>EEP - Banco Escolar</title>
+    <title>EEP - Banco Digital Escolar</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -44,17 +44,19 @@
 
     <!-- HEADER / NAVBAR FIXA -->
     <header class="w-full fixed top-0 left-0 z-50 bg-gradient-hero shadow-lg backdrop-blur-md bg-opacity-95">
-        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+    <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <!-- Logo -->
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-blue-900 text-white flex items-center justify-center font-bold text-xl shadow-md border border-blue-500/90">
-                    E
-                </div>
-                <div>
-                    <span class="text-white font-black tracking-wider text-lg">ERAS</span>
-                    <span class="block text-[10px] text-blue-200 tracking-widest uppercase font-semibold">Banco Escolar</span>
-                </div>
-            </div>
+    <div class="w-14 h-14 rounded-xl bg-white flex items-center justify-center shadow-md border border-blue-500/90 overflow-hidden">
+        <img src="logotipo.jpeg" alt="Logo EEP" class="w-full h-full object-contain scale-150">
+    </div>
+    <div>
+        <span class="text-white font-black tracking-wider text-lg">EEP</span>
+        <span class="block text-[10px] text-blue-200 tracking-widest uppercase font-semibold">Banco Digital Escolar</span>
+    </div>
+</div>
+
+
 
             <!-- Botão Acessar -->
             <div>
@@ -169,14 +171,14 @@
                     </div>
                 </div>
 
-                <!-- Card 3: Professor -->
+                <!-- Card 3: Funcionários -->
                 <div class="bg-white p-6 rounded-2xl border border-purple-100 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col justify-between reveal group">
                     <div>
                         <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-2xl shadow-inner">P</div>
+                            <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-2xl shadow-inner">F</div>
                             <a href="login.php" class="bg-purple-50 text-purple-700 text-xs font-bold px-3 py-1 rounded-full border border-purple-100">ACESSAR</a>
                         </div>
-                        <h3 class="text-xl font-bold text-slate-800 mb-2">Professor</h3>
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Funcionários</h3>
                         <p class="text-slate-600 text-sm leading-relaxed">
                             Pague na cantina e acompanhe seu saldo.
                         </p>
@@ -284,7 +286,7 @@
         </div>
     </section>
 
-    <!-- SEÇÃO 4: POR QUE O ERAS? (COM PAINEL DE DEGRADÊ DE PRETO PARA AZUL) -->
+    <!-- SEÇÃO 4: POR QUE O EEP? (COM PAINEL DE DEGRADÊ DE PRETO PARA AZUL) -->
     <section class="py-24 px-6 bg-slate-50 border-t border-slate-100">
         <div class="max-w-6xl mx-auto">
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
@@ -292,7 +294,7 @@
                 <!-- Coluna de Textos e Vantagens -->
                 <div class="reveal">
                     <h2 class="text-3xl md:text-4xl font-extrabold text-slate-900 mb-6">
-                        Por que o ERAS?
+                        Por que o EEP?
                     </h2>
                     <p class="text-slate-600 mb-8 leading-relaxed">
                         Desenvolvido para o contexto das escolas públicas brasileiras, com interface leve e acessível em qualquer dispositivo.
@@ -361,13 +363,13 @@
     <footer class="bg-gradient-hero text-white py-12 px-6 border-t border-blue-900/50">
         <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
             <div class="flex items-center space-x-3">
-                <div class="w-8 h-8 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow">
-                    E
-                </div>
-                <span class="text-white font-bold tracking-wider">ERAS Banco Escolar</span>
+            <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-md border border-blue-500/90 overflow-hidden">
+        <img src="logotipo.jpeg" alt="Logo EEP" class="w-full h-full object-contain scale-90">
+            </div>
+                <span class="text-white font-bold tracking-wider">EEP Banco Escolar</span>
             </div>
             <p class="text-xs text-blue-300">
-                &copy; 2026 Banco ERAS. Transformando a educação financeira nas escolas públicas.
+                &copy; 2026 Banco EEP. Transformando a educação financeira nas escolas públicas.
             </p> 
         </div>
     </footer>

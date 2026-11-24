@@ -3,8 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Banco ERAS - Login Estudante</title>
-    <!-- Importação da fonte Inter para um visual moderno -->
+    <title>Banco EEP - Login Estudante</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
@@ -32,20 +31,26 @@
             align-items: center;
         }
 
-        /* Logo do Banco */
+        /* Moldura da imagem do logotipo */
         .logo-box {
-            background-color: #1e3a8a;
-            color: white;
-            font-size: 28px;
-            font-weight: 700;
-            width: 56px;
-            height: 56px;
+            background-color: #ffffff;
+            width: 72px;
+            height: 72px;
             display: flex;
             justify-content: center;
             align-items: center;
-            border-radius: 14px;
+            border-radius: 16px;
+            border: 2px solid #3b82f6;
             box-shadow: 0 4px 6px -1px rgba(30, 58, 138, 0.2);
             margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .logo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            transform: scale(1.25);
         }
 
         .brand-title {
@@ -61,7 +66,6 @@
             margin-bottom: 24px;
         }
 
-        /* Botão / Link de Trocar Perfil */
         .trocar-perfil {
             align-self: flex-start;
             font-size: 14px;
@@ -78,7 +82,6 @@
             color: #1e3a8a;
         }
 
-        /* Card do Perfil Selecionado (Estudante) */
         .profile-card {
             width: 100%;
             background-color: #f0f6ff;
@@ -92,9 +95,15 @@
         }
 
         .profile-icon {
-            font-size: 28px;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1e3a8a;
             background: #fff;
-            padding: 10px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border-radius: 10px;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
@@ -111,7 +120,10 @@
             color: #64748b;
         }
 
-        /* Formulário de Login */
+        form {
+            width: 100%;
+        }
+
         .form-group {
             width: 100%;
             margin-bottom: 16px;
@@ -123,11 +135,6 @@
             font-weight: 600;
             color: #334155;
             margin-bottom: 8px;
-        }
-
-        .input-wrapper {
-            position: relative;
-            width: 100%;
         }
 
         .form-group input {
@@ -146,31 +153,6 @@
             box-shadow: 0 0 0 3px rgba(30, 58, 138, 0.1);
         }
 
-        /* Ícone de olho simulado na senha */
-        .password-toggle {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #64748b;
-            cursor: pointer;
-            font-size: 14px;
-        }
-
-        .forgot-password {
-            align-self: flex-end;
-            font-size: 13px;
-            color: #1e3a8a;
-            text-decoration: none;
-            margin-bottom: 24px;
-            font-weight: 500;
-        }
-
-        .forgot-password:hover {
-            text-decoration: underline;
-        }
-
-        /* Botão Entrar */
         .btn-entrar {
             width: 100%;
             background-color: #1e3a8a;
@@ -189,7 +171,6 @@
             background-color: #172554;
         }
 
-        /* Rodapé de cadastro */
         .register-footer {
             margin-top: 24px;
             font-size: 13px;
@@ -206,15 +187,38 @@
         .register-footer a:hover {
             text-decoration: underline;
         }
+
+        .password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+.password-wrapper input {
+    width: 100%;
+    padding-right: 42px; /* Espaço para o ícone não cobrir o texto */
+}
+.toggle-password {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #64748b;
+    padding: 4px;
+}
+
     </style>
 </head>
 <body>
 
     <div class="login-container">
-        <!-- Logo -->
-        <div class="logo-box">E</div>
+        <!-- Logotipo -->
+        <div class="logo-box">
+            <img src="logotipo.jpeg" alt="Logo EEP">
+        </div>
         
-        <h1 class="brand-title">Banco ERAS</h1>
+        <h1 class="brand-title">Banco EEP</h1>
         <p class="brand-subtitle">O banco do ecossistema escolar</p>
 
         <!-- Voltar / Trocar Perfil -->
@@ -229,28 +233,46 @@
             </div>
         </div>
 
-        <!-- Formulário junto(Unificado)-->
-        <form action="services/auth-service/login.php" method="POST">
-    
+        <!-- Formulário conectado ao processar-login.php -->
+        <form action="processar-login.php" method="POST">
     <div class="form-group">
-        <label for="usuario">E-mail, CPF ou RA</label>
-        <input type="text" id="usuario" name="usuario" placeholder="Digite seu e-mail, CPF ou RA" required>
+        <label for="matricula">RA (Matrícula)</label>
+        <input type="text" id="matricula" name="matricula" placeholder="Digite seu RA" required>
     </div>
     
     <div class="form-group">
-        <label for="senha">Senha</label>
+    <label for="senha">Senha</label>
+    <div class="password-wrapper">
         <input type="password" id="senha" name="senha" placeholder="Sua senha" required>
+        <button type="button" class="toggle-password" onclick="alternarSenha()" title="Mostrar ou ocultar senha">👁️</button>
+    </div>
     </div>
 
-    <div style="margin-bottom: 15px; text-align: right;">
-        <a href="esqueci-senha.php" style="font-size: 13px; color: #1e3a8a; text-decoration: none;">Esqueceu a senha?</a>
-    </div>
 
-    <!-- Botão Único de Submissão -->
-    <button type="submit" class="btn-entrar" style="width: 100%; border: none; cursor: pointer; text-align: center; box-sizing: border-box; line-height: 30px;">Entrar</button>
-
-    <div class="register-footer" style="margin-top: 15px; text-align: center;">
-        Primeiro acesso? <a href="cadastro-estudante.php" style="color: #1e3a8a; font-weight: bold; text-decoration: none;">Cadastre-se aqui</a>
+    <button type="submit" class="btn-entrar">Entrar</button>
+    <div class="register-footer">
+         Já fez seu cadastro? <a href="cadastro-estudante.php">Faça cadastro aqui</a>
+     </div>
+    <div class="register-footer">
+         Esqueceu senha? <a href="recuperar-senha.php">Recupere Aqui</a>
     </div>
 
 </form>
+
+    <script>
+function alternarSenha() {
+    const campo = document.getElementById('senha');
+    const botao = document.querySelector('.toggle-password');
+    if (campo.type === 'password') {
+        campo.type = 'text';
+        botao.innerText = '🙈';
+    } else {
+        campo.type = 'password';
+        botao.innerText = '👁️';
+    }
+}
+</script>
+
+
+</body>
+</html>
