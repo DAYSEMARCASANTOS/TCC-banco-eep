@@ -215,8 +215,9 @@
     <div class="login-container">
         <!-- Logotipo -->
         <div class="logo-box">
-            <img src="logotipo.jpeg" alt="Logo EEP">
-        </div>
+        <img src="../assets/img/logotipo.jpeg" alt="Logo EEP" class="w-full h-full object-contain scale-90">
+
+    </div>
         
         <h1 class="brand-title">Banco EEP</h1>
         <p class="brand-subtitle">O banco do ecossistema escolar</p>
@@ -234,7 +235,7 @@
         </div>
 
         <!-- Formulário conectado ao processar-login.php -->
-        <form action="processar-login.php" method="POST">
+        <form action="../actions/processar-login.php" method="POST">
     <div class="form-group">
         <label for="matricula">RA (Matrícula)</label>
         <input type="text" id="matricula" name="matricula" placeholder="Digite seu RA" required>

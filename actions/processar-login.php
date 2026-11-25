@@ -30,7 +30,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $_SESSION['usuario_id'] = $aluno['id'];
         $_SESSION['ra']         = $aluno['ra'];
 
-        header("Location: painel.php");
+        header("Location: ../estudante/painel.php");
         exit();
     } else {
         echo "<script>alert('RA ou senha incorretos!'); window.location.href='login-estudante.php';</script>";

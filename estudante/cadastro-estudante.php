@@ -70,7 +70,7 @@
 <body>
     <form action="processar-cadastro.php" method="POST" enctype="multipart/form-data" class="login-container">
         <div class="logo-box">
-            <img src="logotipo.jpeg" alt="Logo EEP">
+            <img src="../assets/img/logotipo.jpeg" alt="Logo EEP">
         </div>
         <h1 class="brand-title">EEP</h1>
         <p class="brand-subtitle">Banco Escolar • Cadastro de Estudante</p>

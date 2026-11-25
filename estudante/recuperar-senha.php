@@ -109,7 +109,7 @@ $conexao->close();
 <body>
     <div class="card-container">
         <div class="logo-box">
-            <img src="logotipo.jpeg" alt="Logo EEP">
+            <img src="../assets/img/logotipo.jpeg" alt="Logo EEP">
         </div>
         <h1 class="title">Recuperar Senha</h1>
         <p class="subtitle">Confirme seus dados escolares para criar uma nova senha</p>

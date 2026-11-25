@@ -48,7 +48,8 @@
             <!-- Logo -->
             <div class="flex items-center space-x-3">
     <div class="w-14 h-14 rounded-xl bg-white flex items-center justify-center shadow-md border border-blue-500/90 overflow-hidden">
-        <img src="logotipo.jpeg" alt="Logo EEP" class="w-full h-full object-contain scale-150">
+    <img src="assets/img/logotipo.jpeg" alt="Logo EEP" class="w-full h-full object-contain scale-150">
+
     </div>
     <div>
         <span class="text-white font-black tracking-wider text-lg">EEP</span>
@@ -77,7 +78,7 @@
             <!-- Tag superior -->
             <div class="inline-block mb-6">
                 <span class="bg-white/10 border border-white/20 text-blue-100 text-xs font-semibold px-4 py-1.5 rounded-full tracking-wider uppercase backdrop-blur-sm shadow-inner">
-                    Banco Escolar Brasileira
+                    Banco Escolar Brasileiro
                 </span>
             </div>
 
@@ -159,7 +160,7 @@
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-2xl shadow-inner">R</div>
-                            <a href="login.php" class="bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full border border-emerald-100">ACESSAR</a>
+                            <a href="../login.php" class="bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full border border-emerald-100">ACESSAR</a>
                         </div>
                         <h3 class="text-xl font-bold text-slate-800 mb-2">Responsável</h3>
                         <p class="text-slate-600 text-sm leading-relaxed">
@@ -364,7 +365,8 @@
         <div class="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6 text-center md:text-left">
             <div class="flex items-center space-x-3">
             <div class="w-10 h-10 rounded-xl bg-white flex items-center justify-center shadow-md border border-blue-500/90 overflow-hidden">
-        <img src="logotipo.jpeg" alt="Logo EEP" class="w-full h-full object-contain scale-90">
+            <img src="assets/img/logotipo.jpeg" alt="Logo EEP" class="w-full h-full object-contain scale-90">
+
             </div>
                 <span class="text-white font-bold tracking-wider">EEP Banco Escolar</span>
             </div>
