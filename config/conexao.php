@@ -1,6 +1,6 @@
 <?php
 $host = 'localhost';
-$db   = 'banco_eep';
+$db   = 'banco-eep';
 $user = 'root';
 $pass = ''; // No XAMPP a senha padrão do root é vazia
 

@@ -160,13 +160,13 @@
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-2xl shadow-inner">R</div>
-                            <a href="../login.php" class="bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full border border-emerald-100">ACESSAR</a>
+                            <a href="login.php" class="bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full border border-emerald-100 hover:bg-emerald-100 transition">ACESSAR</a>
                         </div>
-                        <h3 class="text-xl font-bold text-slate-800 mb-2">Responsável</h3>
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Estudante</h3>
                         <p class="text-slate-600 text-sm leading-relaxed">
                             Monitore os gastos, envie mesada e defina limites.
                         </p>
-                    </div>
+                </div>
                     <div class="mt-6 flex justify-end text-emerald-600 group-hover:translate-x-2 transition-transform">
                         <i class="fa-solid.fa-arrow-right text-lg"></i>
                     </div>

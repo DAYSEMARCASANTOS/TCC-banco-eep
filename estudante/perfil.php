@@ -346,6 +346,77 @@ $conexao->close();
                 </div>
             </div>
 
+            <div class="info-item" style="padding: 12px 0;">
+    <div style="display: flex; justify-content: space-between; align-items: center;">
+        <div>
+            <span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">
+                RESPONSÁVEL(IS) VINCULADO(S)
+            </span>
+            <p style="font-size: 15px; font-weight: 700; color: #1e293b; margin-top: 4px;">
+                Mariana Oliveira Santos
+                <!-- Aqui você pode listar os outros responsáveis vindos do banco -->
+            </p>
+        </div>
+
+        <button type="button" onclick="abrirFormResponsavel()" 
+                style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">
+            + Adicionar
+        </button>
+    </div>
+
+    <!-- Formulário oculto que abre ao clicar em "+ Adicionar" -->
+    <form id="formNovoResponsavel" action="../actions/adicionar-responsavel-aluno.php" method="POST" 
+          style="display: none; margin-top: 14px; background: #f8fafc; padding: 14px; border-radius: 12px; border: 1px solid #e2e8f0;">
+        
+        <p style="font-size: 13px; font-weight: 700; color: #0f172a; margin-bottom: 10px;">
+            Vincular Novo Responsável
+        </p>
+
+        <div style="margin-bottom: 10px;">
+            <label style="display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px;">
+                Nome Completo do Responsável
+            </label>
+            <input type="text" name="nome_responsavel" placeholder="Ex: Carlos Eduardo Santos" required
+                   style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px;">
+        </div>
+
+        <div style="margin-bottom: 12px;">
+            <label style="display: block; font-size: 12px; font-weight: 600; color: #475569; margin-bottom: 4px;">
+                CPF do Responsável
+            </label>
+            <input type="text" name="cpf_responsavel" placeholder="000.000.000-00" maxlength="14" oninput="mascaraCPF(this)" required
+                   style="width: 100%; padding: 10px; border: 1px solid #cbd5e1; border-radius: 8px; font-size: 13px;">
+        </div>
+
+        <div style="display: flex; gap: 8px;">
+            <button type="submit" 
+                    style="flex: 1; background: #1d4ed8; color: #fff; border: none; padding: 10px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer;">
+                Salvar Responsável
+            </button>
+            <button type="button" onclick="abrirFormResponsavel()" 
+                    style="background: #e2e8f0; color: #475569; border: none; padding: 10px 14px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;">
+                Cancelar
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function abrirFormResponsavel() {
+        const form = document.getElementById('formNovoResponsavel');
+        form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function mascaraCPF(campo) {
+        let v = campo.value.replace(/\D/g, '');
+        v = v.replace(/(\d{3})(\d)/, '$1.$2');
+        v = v.replace(/(\d{3})(\d)/, '$1.$2');
+        v = v.replace(/(\d{3})(\d{1,2})$/, '$1-$2');
+        campo.value = v;
+    }
+</script>
+
+
             <!-- Seção 2: Proteção de Emergência (Cartão e Transações) -->
             <div class="section-card danger-zone">
                 <div class="section-title danger">
