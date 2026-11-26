@@ -312,7 +312,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 
     <!-- Ajuste o href abaixo se o seu arquivo de login tiver outro nome (ex: index.php) -->
-    <a href="login.php" class="back-link">← Voltar para o Login</a>
+    <a href="login-responsavel.php" class="back-link">← Voltar para o Login</a>
 </div>
 <script>
     const inputCpf = document.getElementById('cpf');

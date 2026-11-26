@@ -218,7 +218,7 @@
 
     <div class="footer-links">
         <div>Não tem cadastro ainda? <a href="cadastro.php">Faça cadastro aqui</a></div>
-        <div>Esqueceu senha? <a href="recuperar_senha.php">Recupere Aqui</a></div>
+        <div>Esqueceu senha? <a href="recuperar-senha-funcionario.php">Recupere Aqui</a></div>
     </div>
 </div>
 

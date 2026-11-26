@@ -239,7 +239,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 
     <div class="footer-links">
-        Já possui cadastro? <a href="../login-funcionario.php">Faça login aqui</a>
+        Já possui cadastro? <a href="login-funcionario.php">Faça login aqui</a>
     </div>
 </div>
 

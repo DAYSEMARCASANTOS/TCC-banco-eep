@@ -121,6 +121,7 @@ $conexao->close();
         <?php endif; ?>
 
         <?php if ($etapa === 1): ?>
+            
             <!-- Etapa 1: Validar RA e CPF -->
             <form method="POST">
                 <input type="hidden" name="acao" value="validar_dados">

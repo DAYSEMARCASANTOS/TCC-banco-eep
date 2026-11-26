@@ -406,7 +406,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 
     <div class="footer-link">
-        Já tem uma conta? <a href="login.php">Faça login aqui</a>
+        Já tem uma conta? <a href="login-responsavel.php">Faça login aqui</a>
     </div>
 </div>
 <script>
