@@ -182,8 +182,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p>O banco do ecossistema escolar</p>
     </div>
 
-    <a href="funcionario.php" class="back-link">← Voltar para o login</a>
-
     <div class="profile-banner">
         <div class="profile-badge">F</div>
         <div class="profile-info">
@@ -241,7 +239,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 
     <div class="footer-links">
-        Já possui cadastro? <a href="funcionario.php">Faça login aqui</a>
+        Já possui cadastro? <a href="../login-funcionario.php">Faça login aqui</a>
     </div>
 </div>
 

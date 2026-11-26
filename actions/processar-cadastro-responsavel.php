@@ -7,7 +7,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     exit();
 }
 
-// Função auxiliar para padronizar CPF apenas com números (evita duplicidade por pontuação)
+// Função auxiliar para padronizar CPF e telefone apenas com números
 function limparNumeros($valor) {
     return preg_replace('/\D/', '', $valor);
 }
@@ -32,7 +32,7 @@ if ($senha !== $confirmar_senha) {
     exit();
 }
 
-// 2. Filtra e remove filhos duplicados antes mesmo de abrir transação no banco
+// 2. Filtra e remove filhos duplicados antes de abrir transação no banco
 $filhosValidos = [];
 $cpfsVistos = [];
 
@@ -55,39 +55,34 @@ if (empty($filhosValidos)) {
     exit();
 }
 
-// 3. Verifica se o responsável já existe
-$stmtVerifica = $conexao->prepare("SELECT id FROM responsaveis WHERE cpf = ? LIMIT 1");
-$stmtVerifica->bind_param("s", $cpf);
-$stmtVerifica->execute();
-if ($stmtVerifica->get_result()->num_rows > 0) {
-    echo "<script>alert('Este CPF já possui cadastro! Faça login.'); window.location.href='../responsavel/login-responsavel.php';</script>";
-    exit();
-}
-$stmtVerifica->close();
-
-// 4. Grava tudo em lote dentro de uma transação
-$conexao->begin_transaction();
-
 try {
+    // 3. Verifica se o responsável já existe
+    $stmtVerifica = $pdo->prepare("SELECT id FROM responsaveis WHERE cpf = ? LIMIT 1");
+    $stmtVerifica->execute([$cpf]);
+
+    if ($stmtVerifica->fetch()) {
+        echo "<script>alert('Este CPF já possui cadastro! Faça login.'); window.location.href='../responsavel/login-responsavel.php';</script>";
+        exit();
+    }
+
+    // 4. Grava tudo em lote dentro de uma transação
+    $pdo->beginTransaction();
+
     $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
 
-    $stmtResp = $conexao->prepare("INSERT INTO responsaveis (nome, cpf, telefone, senha) VALUES (?, ?, ?, ?)");
-    $stmtResp->bind_param("ssss", $nome, $cpf, $telefone, $senhaHash);
-    $stmtResp->execute();
-    $responsavel_id = $conexao->insert_id;
-    $stmtResp->close();
+    $stmtResp = $pdo->prepare("INSERT INTO responsaveis (nome_completo, cpf, telefone, senha) VALUES (?, ?, ?, ?)");
 
-    // Prepared statement reutilizado no loop (alta performance para 6, 10 ou 50 filhos)
-    $stmtFilho = $conexao->prepare("INSERT INTO responsavel_filhos (responsavel_id, nome_filho, cpf_filho) VALUES (?, ?, ?)");
+    $stmtResp->execute([$nome, $cpf, $telefone, $senhaHash]);
+    $responsavel_id = $pdo->lastInsertId();
+
+    $stmtFilho = $pdo->prepare("INSERT INTO responsavel_filhos (responsavel_id, nome_filho, cpf_filho) VALUES (?, ?, ?)");
     foreach ($filhosValidos as $filho) {
-        $stmtFilho->bind_param("iss", $responsavel_id, $filho['nome'], $filho['cpf']);
-        $stmtFilho->execute();
+        $stmtFilho->execute([$responsavel_id, $filho['nome'], $filho['cpf']]);
     }
-    $stmtFilho->close();
 
-    $conexao->commit();
+    $pdo->commit();
 
-    // Login automático após cadastro (mais prático que obrigar a digitar tudo de novo)
+    // Login automático após cadastro
     $_SESSION['responsavel_id']   = $responsavel_id;
     $_SESSION['responsavel_nome'] = $nome;
 
@@ -98,8 +93,10 @@ try {
     exit();
 
 } catch (Exception $e) {
-    $conexao->rollback();
-    echo "<script>alert('Erro ao salvar cadastro. Tente novamente.'); history.back();</script>";
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+    echo "<script>alert('Erro ao salvar cadastro: " . addslashes($e->getMessage()) . "'); history.back();</script>";
     exit();
 }
-$conexao->close();
+

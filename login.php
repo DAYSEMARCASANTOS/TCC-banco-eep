@@ -65,7 +65,7 @@
 
 
             <!-- Funcionários -->
-            <a href="login-professor.php" class="block bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-purple-400 transition-all duration-300 group">
+            <a href="funcionario/login-funcionario.php" class="block bg-white p-5 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md hover:border-purple-400 transition-all duration-300 group">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-4">
                         <div class="w-12 h-12 rounded-xl bg-purple-50 text-purple-700 font-bold flex items-center justify-center text-xl shadow-inner">F</div>

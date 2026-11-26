@@ -139,10 +139,13 @@
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 
                 <!-- Card 1: Estudante -->
-                <div class="bg-white p-6 rounded-2xl border border-blue-100 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col justify-between reveal group">
-                    <div>
-                        <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 rounded-xl bg-pink-50 flex items-center justify-center text-2xl shadow-inner">E</div>
+            <div class="bg-white p-6 rounded-2xl border border-emerald-100 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col justify-between reveal group">
+            <div>
+                 <div class="flex items-center justify-between mb-4">
+            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-400 font-bold flex items-center justify-center text-2xl shadow-inner">
+                E
+            </div>
+
                             <a  href="login.php" class="bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1 rounded-full border border-blue-100">ACESSAR</a>
                         </div>
                         <h3 class="text-xl font-bold text-slate-800 mb-2">Estudante</h3>
@@ -162,7 +165,7 @@
                             <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-2xl shadow-inner">R</div>
                             <a href="login.php" class="bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full border border-emerald-100 hover:bg-emerald-100 transition">ACESSAR</a>
                         </div>
-                        <h3 class="text-xl font-bold text-slate-800 mb-2">Estudante</h3>
+                        <h3 class="text-xl font-bold text-slate-800 mb-2">Responsável</h3>
                         <p class="text-slate-600 text-sm leading-relaxed">
                             Monitore os gastos, envie mesada e defina limites.
                         </p>
@@ -173,10 +176,10 @@
                 </div>
 
                 <!-- Card 3: Funcionários -->
-                <div class="bg-white p-6 rounded-2xl border border-purple-100 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col justify-between reveal group">
+                <div class="bg-white p-6 rounded-2xl border border-blue-100 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col justify-between reveal group">
                     <div>
                         <div class="flex items-center justify-between mb-4">
-                            <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-2xl shadow-inner">F</div>
+                            <div class="w-12 h-12 rounded-xl bg-pink-50 flex items-center justify-center text-2xl shadow-inner">F</div>
                             <a href="login.php" class="bg-purple-50 text-purple-700 text-xs font-bold px-3 py-1 rounded-full border border-purple-100">ACESSAR</a>
                         </div>
                         <h3 class="text-xl font-bold text-slate-800 mb-2">Funcionários</h3>
@@ -184,11 +187,11 @@
                             Pague na cantina e acompanhe seu saldo.
                         </p>
                     </div>
-                    <div class="mt-6 flex justify-end text-purple-600 group-hover:translate-x-2 transition-transform">
+                    <div class="mt-6 flex justify-end text-blue-600 group-hover:translate-x-2 transition-transform">
                         <i class="fa-solid.fa-arrow-right text-lg"></i>
                     </div>
                 </div>
-
+                
                 <!-- Card 4: Vendedor -->
                 <div class="bg-white p-6 rounded-2xl border border-orange-100 shadow-sm hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1.5 flex flex-col justify-between reveal group">
                     <div>

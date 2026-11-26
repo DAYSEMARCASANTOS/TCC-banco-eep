@@ -223,7 +223,7 @@
         <p class="brand-subtitle">O banco do ecossistema escolar</p>
 
         <!-- Voltar / Trocar Perfil -->
-        <a href="login.php" class="trocar-perfil">← Trocar perfil</a>
+        <a href="../login.php" class="trocar-perfil">← Trocar perfil</a>
 
         <!-- Card Perfil Estudante Selecionado -->
         <div class="profile-card">

@@ -166,21 +166,66 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 $res_est = $conexao->query("SELECT * FROM estudantes WHERE ra = '$ra_logado'");
 $estudante = $res_est ? $res_est->fetch_assoc() : [];
 
-// Busca status de segurança atual
-$res_seg = $conexao->query("SELECT * FROM seguranca_conta WHERE ra = '$ra_logado'");
-$seguranca = $res_seg ? $res_seg->fetch_assoc() : ['cartao_status' => 'ativo', 'transacoes_travadas' => 0];
-$cartao_cancelado = ($seguranca['cartao_status'] === 'cancelado');
-$transacoes_travadas = ((int)$seguranca['transacoes_travadas'] === 1);
+// Busca os dados do estudante
+$res_est = $conexao->query("SELECT * FROM estudantes WHERE ra = '$ra_logado'");
+$estudante = $res_est ? $res_est->fetch_assoc() : [];
 
-$conexao->close();
+// 1. Cria uma lista começando com o nome que já está na tabela 'estudantes' (Mariana)
+$lista_responsaveis = [];
+if (!empty($estudante['responsavel'])) {
+    $lista_responsaveis[] = $estudante['responsavel'];
+}
+// 1. Cria uma lista começando com o nome que já está na tabela 'estudantes' (Mariana)
+$lista_responsaveis = [];
+if (!empty($estudante['responsavel'])) {
+    $lista_responsaveis[] = $estudante['responsavel'];
+}
+
+// 2. Busca os novos responsáveis na tabela 'responsavel_filhos' usando o CPF do estudante
+$cpf_estudante_limpo = preg_replace('/\D/', '', $estudante['cpf'] ?? '');
+
+if (!empty($cpf_estudante_limpo)) {
+    $sqlResp = "SELECT r.nome_completo 
+                FROM responsavel_filhos rf 
+                INNER JOIN responsaveis r ON rf.responsavel_id = r.id 
+                WHERE REPLACE(REPLACE(rf.cpf_filho, '.', ''), '-', '') = ?";
+    $stmtResp = $conexao->prepare($sqlResp);
+    
+    if ($stmtResp) {
+        $stmtResp->bind_param("s", $cpf_estudante_limpo);
+        $stmtResp->execute();
+        $resResp = $stmtResp->get_result();
+
+        while ($r = $resResp->fetch_assoc()) {
+            if (!in_array($r['nome_completo'], $lista_responsaveis)) {
+                $lista_responsaveis[] = $r['nome_completo'];
+            }
+        }
+        $stmtResp->close();
+    }
+}
+
+// Busca as configurações de segurança do cartão/conta
+$res_seg = $conexao->query("SELECT * FROM seguranca_conta WHERE ra = '$ra_logado'");
+$seguranca = $res_seg ? $res_seg->fetch_assoc() : [];
+
+$cartao_cancelado = !empty($seguranca['cartao_cancelado']) ? true : false;
+$transacoes_travadas = !empty($seguranca['transacoes_travadas']) ? true : false;
+
+// 3. Junta todos os nomes para exibir na tela
+$todos_responsaveis = !empty($lista_responsaveis) ? implode(', ', $lista_responsaveis) : 'Não informado';
+
 ?>
+
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Banco EEP - Perfil e Segurança</title>
-    <link href="https://googleapis.com" rel="stylesheet">
+    <link href
+="https://googleapis.com" rel="stylesheet">
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
         body { background-color: #f1f5f9; min-height: 100vh; color: #1e293b; display: flex; justify-content: center; }
@@ -322,41 +367,34 @@ $conexao->close();
                 <?= htmlspecialchars($mensagem) ?>
             </div>
         <?php endif; ?>
-
+        
         <div class="content-body">
-            <!-- Seção 1: Dados do Estudante e Responsáveis -->
-            <div class="section-card">
-                <div class="section-title">👤 Informações da Conta</div>
-                
-                <div class="info-group">
-                    <div class="info-label">Nome Completo</div>
-                    <div class="info-value"><?= htmlspecialchars($estudante['nome_completo'] ?? 'Não informado') ?></div>
-                </div>
-                <div class="info-group">
-                    <div class="info-label">Matrícula (RA)</div>
-                    <div class="info-value"><?= htmlspecialchars($estudante['ra'] ?? '') ?></div>
-                </div>
-                <div class="info-group">
-                    <div class="info-label">Escola</div>
-                    <div class="info-value"><?= htmlspecialchars($estudante['escola'] ?? 'Não informada') ?></div>
-                </div>
-                <div class="info-group">
-                    <div class="info-label">Responsável(is) Vinculado(s)</div>
-                    <div class="info-value" style="border-bottom: none;"><?= htmlspecialchars($estudante['responsavel'] ?? 'Não informado') ?></div>
-                </div>
+        <!-- Seção 1: Dados do Estudante e Responsáveis -->
+        <div class="section-card">
+            <div class="section-title">👤 Informações da Conta</div>
+            
+            <div class="info-group">
+                <div class="info-label">Escola</div>
+                <div class="info-value"><?= htmlspecialchars($estudante['escola'] ?? 'Não informada') ?></div>
             </div>
-
-            <div class="info-item" style="padding: 12px 0;">
-    <div style="display: flex; justify-content: space-between; align-items: center;">
-        <div>
-            <span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">
-                RESPONSÁVEL(IS) VINCULADO(S)
-            </span>
-            <p style="font-size: 15px; font-weight: 700; color: #1e293b; margin-top: 4px;">
-                Mariana Oliveira Santos
-                <!-- Aqui você pode listar os outros responsáveis vindos do banco -->
-            </p>
+            <div class="info-group">
+                <div class="info-label">Responsável(is) Vinculado(s)</div>
+                <div class="info-value" style="border-bottom: none;"><?= htmlspecialchars($todos_responsaveis) ?></div>
+            </div>
         </div>
+    
+        <div class="info-item" style="padding: 12px 0;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <span style="font-size: 11px; font-weight: 700; color: #64748b; text-transform: uppercase;">
+                        RESPONSÁVEL(IS) VINCULADO(S)
+                    </span>
+                    <p style="font-size: 15px; font-weight: 700; color: #1e293b; margin-top: 4px;">
+                        <?= htmlspecialchars($todos_responsaveis) ?>
+                    </p>
+                </div>
+    
+      
 
         <button type="button" onclick="abrirFormResponsavel()" 
                 style="background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; padding: 6px 12px; border-radius: 8px; font-size: 12px; font-weight: 700; cursor: pointer;">

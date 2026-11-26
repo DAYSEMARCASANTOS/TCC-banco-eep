@@ -164,6 +164,17 @@
         }
         .footer-links a:hover {
             text-decoration: underline;
+        } /* <-- Faltava fechar esta chave! */
+
+        .logo-box {
+            overflow: hidden; /* Garante que a imagem não vaze das bordas arredondadas */
+        }
+
+        .logo-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 10px;
         }
     </style>
 </head>
@@ -171,7 +182,9 @@
 
 <div class="card">
     <div class="header">
-        <div class="logo-box">P</div>
+        <div class="logo-box">
+            <img src="../assets/img/logotipo.jpeg" alt="Logo EEP">
+        </div>
         <h1>Banco EEP</h1>
         <p>O banco do ecossistema escolar</p>
     </div>
@@ -204,7 +217,7 @@
     </form>
 
     <div class="footer-links">
-        <div>Não tem cadastro ainda? <a href="cadastro_funcionario.php">Faça cadastro aqui</a></div>
+        <div>Não tem cadastro ainda? <a href="cadastro.php">Faça cadastro aqui</a></div>
         <div>Esqueceu senha? <a href="recuperar_senha.php">Recupere Aqui</a></div>
     </div>
 </div>
