@@ -6,26 +6,25 @@ $senha = "";
 $banco = "banco-eep";
 
 $conn = new mysqli($host, $usuario, $senha, $banco);
-
 if ($conn->connect_error) {
-    die("Erro na conexão com o banco: " . $conn->connect_error);
+    die(json_encode(["status" => "erro", "mensagem" => "Erro na conexão com o banco: " . $conn->connect_error]));
 }
 $conn->set_charset("utf8mb4");
 
 // 2. Recebimento e Validação dos Dados (via POST do JavaScript)
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Content-Type: application/json');
+
     $dados = json_decode(file_get_contents("php://input"), true);
 
     $nome = trim($dados['nome'] ?? '');
-    $cpf = trim($dados['cpf'] ?? '');
+    $cpf = preg_replace('/\D/', '', $dados['cpf'] ?? ''); // Salva apenas números (11 dígitos)
     $telefone = trim($dados['telefone'] ?? '');
     $senhaPura = $dados['senha'] ?? '';
-    $filhos = $dados['filhos'] ?? []; // Lista de filhos enviados pelo formulário
+    $filhos = $dados['filhos'] ?? [];
 
-    // Verifica se algum campo obrigatório veio vazio
-    if (empty($nome) || empty($cpf) || empty($senhaPura) || empty($filhos)) {
-        echo json_encode(["status" => "erro", "mensagem" => "Preencha todos os campos obrigatórios."]);
+    if (empty($nome) || strlen($cpf) !== 11 || empty($senhaPura) || empty($filhos)) {
+        echo json_encode(["status" => "erro", "mensagem" => "Preencha todos os campos obrigatórios e um CPF válido."]);
         exit;
     }
 
@@ -39,25 +38,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
     $stmtCheck->close();
 
-    // Verifica se TODOS os RAs informados existem na tabela 'estudantes'
+    // Verifica se TODOS os RAs informados existem na tabela 'estudantes' e pega os dados reais deles
     $primeiroRa = '';
+    $filhosValidados = [];
+
     foreach ($filhos as $index => $filho) {
         $ra = trim($filho['ra'] ?? '');
         if ($index === 0) {
             $primeiroRa = $ra;
         }
 
-        $stmtAluno = $conn->prepare("SELECT id, nome_completo FROM estudantes WHERE ra = ?");
+        $stmtAluno = $conn->prepare("SELECT id, nome_completo, cpf FROM estudantes WHERE ra = ?");
         $stmtAluno->bind_param("s", $ra);
         $stmtAluno->execute();
         $resAluno = $stmtAluno->get_result();
 
-        if ($resAluno->num_rows === 0) {
+        if ($dadosAluno = $resAluno->fetch_assoc()) {
+            $filhosValidados[] = [
+                'ra'   => $ra,
+                'nome' => $dadosAluno['nome_completo'],
+                'cpf'  => preg_replace('/\D/', '', $dadosAluno['cpf'])
+            ];
+        } else {
             echo json_encode(["status" => "erro", "mensagem" => "Estudante com RA ($ra) não encontrado no Banco EEP."]);
             exit;
         }
         $stmtAluno->close();
     }
+
     // 3. Inicia a transação para salvar e vincular tudo com segurança
     $conn->begin_transaction();
 
@@ -66,44 +74,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $senhaHash = password_hash($senhaPura, PASSWORD_DEFAULT);
 
         // B. Insere o Responsável na tabela 'responsaveis'
-        // (Certifique-se de ter rodado o ALTER TABLE para criar a coluna 'telefone' no phpMyAdmin)
         $stmtResp = $conn->prepare("INSERT INTO responsaveis (nome_completo, cpf, telefone, ra_estudante, senha) VALUES (?, ?, ?, ?, ?)");
         $stmtResp->bind_param("sssss", $nome, $cpf, $telefone, $primeiroRa, $senhaHash);
         $stmtResp->execute();
-        $responsavelId = $conn->insert_id; // Pega o ID que acabou de ser gerado para esse responsável
+        $responsavelId = $conn->insert_id;
         $stmtResp->close();
 
-        // C. Vincula cada filho na tabela 'responsavel_filhos' e atualiza o perfil na tabela 'estudantes'
-        foreach ($filhos as $filho) {
-            $ra = trim($filho['ra']);
-
-            // Grava o vínculo na tabela 'responsavel_filhos'
-            $stmtVinc = $conn->prepare("INSERT INTO responsavel_filhos (responsavel_id, ra_estudante) VALUES (?, ?)");
-            $stmtVinc->bind_param("is", $responsavelId, $ra);
+        // C. Vincula cada filho na tabela 'responsavel_filhos' usando as colunas exatas do seu banco
+        foreach ($filhosValidados as $filho) {
+            $stmtVinc = $conn->prepare("INSERT INTO responsavel_filhos (responsavel_id, nome_filho, cpf_filho) VALUES (?, ?, ?)");
+            $stmtVinc->bind_param("iss", $responsavelId, $filho['nome'], $filho['cpf']);
             $stmtVinc->execute();
             $stmtVinc->close();
-
-            // Atualiza o nome do responsável direto na ficha do estudante para aparecer no perfil dele
-            $stmtUpdAluno = $conn->prepare("UPDATE estudantes SET responsavel = ? WHERE ra = ?");
-            $stmtUpdAluno->bind_param("ss", $nome, $ra);
-            $stmtUpdAluno->execute();
-            $stmtUpdAluno->close();
         }
 
-        // Confirma todas as gravações no banco
         $conn->commit();
         echo json_encode(["status" => "sucesso", "mensagem" => "Conta criada e vinculada ao estudante com sucesso!"]);
 
     } catch (Exception $e) {
-        // Se algo der errado, cancela tudo para não deixar cadastro pela metade
         $conn->rollback();
-        echo json_encode(["status" => "erro", "mensagem" => "Erro ao salvar no banco: " . $e->getMessage()]);
+        echo json_encode(["status" => "erro", "mensagem" => "Erro no banco: " . $e->getMessage()]);
     }
 
     $conn->close();
     exit;
-} // <-- Fecha o "if ($_SERVER['REQUEST_METHOD'] === 'POST')" lá da Parte 1
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -111,250 +108,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Responsável - Banco EEP</title>
     <style>
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-        }
-
-        body {
-            background-color: #f3f4f6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 24px 16px;
-        }
-
-        .card {
-            background: #ffffff;
-            width: 100%;
-            max-width: 460px;
-            padding: 36px 32px;
-            border-radius: 16px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+        body { background-color: #f3f4f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 24px 16px; }
+        .card { background: #ffffff; width: 100%; max-width: 460px; padding: 36px 32px; border-radius: 16px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05); }
+        .header { text-align: center; margin-bottom: 24px; }
         .logo-box {
-            width: 56px;
-            height: 56px;
+            width: 64px;
+            height: 64px;
             margin: 0 auto 12px;
             border: 2.5px solid #15803d;
-            border-radius: 14px;
+            border-radius: 16px;
             display: flex;
             justify-content: center;
             align-items: center;
-            color: #1d4ed8;
-        }
-
-        .header h1 {
-            font-size: 22px;
-            color: #111827;
-            font-weight: 800;
-        }
-
-        .header p {
-            font-size: 13px;
-            color: #6b7280;
-            margin-top: 4px;
-        }
-
-        .form-group {
-            margin-bottom: 16px;
-        }
-
-        label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            color: #374151;
-            margin-bottom: 6px;
-        }
-
-        input {
-            width: 100%;
-            padding: 12px 14px;
-            font-size: 14px;
-            border: 1px solid #d1d5db;
-            border-radius: 10px;
-            background-color: #f9fafb;
-            color: #1f2937;
-            outline: none;
-            transition: border-color 0.2s, box-shadow 0.2s;
-        }
-
-        input:focus {
-            border-color: #15803d;
             background-color: #ffffff;
-            box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.15);
-        }
+            overflow: hidden;
+            padding: 4px;
+}
 
-        /* Caixa Verde de Dependentes / Filhos */
-        .dependents-box {
-            background-color: #f0fdf4;
-            border: 1px solid #bbf7d0;
-            border-radius: 12px;
-            padding: 16px;
-            margin: 20px 0;
-        }
-
-        .dependents-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .dependents-header span {
-            font-size: 13px;
-            font-weight: 600;
-            color: #166534;
-        }
-
-        .badge-count {
-            background-color: #15803d;
-            color: #ffffff;
-            font-size: 11px;
-            font-weight: 700;
-            padding: 3px 10px;
-            border-radius: 12px;
-        }
-
-        .filho-item {
-            background: #ffffff;
-            border: 1px solid #dcfce7;
-            border-radius: 10px;
-            padding: 12px;
-            margin-bottom: 10px;
-        }
-
-        .filho-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: #15803d;
-            text-transform: uppercase;
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .btn-remove {
-            color: #dc2626;
-            background: none;
-            border: none;
-            font-size: 12px;
-            cursor: pointer;
-            font-weight: 600;
-        }
-
-        .filho-item input {
-            margin-bottom: 8px;
-            background-color: #eef2ff;
-        }
-
-        .filho-item input:last-child {
-            margin-bottom: 0;
-        }
-
-        .btn-add-filho {
+         .logo-box img {
             width: 100%;
-            padding: 10px;
-            background: #ffffff;
-            border: 1.5px dashed #86efac;
-            border-radius: 8px;
-            color: #15803d;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
+            height: 100%;
+            object-fit: contain;
+}
 
-        .btn-add-filho:hover {
-            background-color: #dcfce7;
-        }
-
-        .btn-submit {
-            width: 100%;
-            padding: 14px;
-            font-size: 15px;
-            font-weight: 600;
-            color: #ffffff;
-            background-color: #15803d;
-            border: none;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-            margin-top: 8px;
-        }
-
-        .btn-submit:hover {
-            background-color: #166534;
-        }
-
-        .btn-submit:disabled {
-            background-color: #86efac;
-            cursor: not-allowed;
-        }
-
-        .footer-link {
-            text-align: center;
-            margin-top: 18px;
-            font-size: 13px;
-            color: #6b7280;
-        }
-
-        .footer-link a {
-            color: #15803d;
-            font-weight: 600;
-            text-decoration: none;
-        }
-
-        .footer-link a:hover {
-            text-decoration: underline;
-        }
-
-        .alert {
-            padding: 12px;
-            border-radius: 8px;
-            font-size: 13px;
-            margin-bottom: 16px;
-            display: none;
-        }
-
-        .alert-erro {
-            background-color: #fee2e2;
-            color: #b91c1c;
-            border: 1px solid #fecaca;
-        }
-
-        .alert-sucesso {
-            background-color: #dcfce7;
-            color: #15803d;
-            border: 1px solid #bbf7d0;
-        }
+        .header h1 { font-size: 22px; color: #111827; font-weight: 800; }
+        .header p { font-size: 13px; color: #6b7280; margin-top: 4px; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; font-size: 13px; font-weight: 600; color: #374151; margin-bottom: 6px; }
+        input { width: 100%; padding: 12px 14px; font-size: 14px; border: 1px solid #d1d5db; border-radius: 10px; background-color: #f9fafb; color: #1f2937; outline: none; transition: border-color 0.2s, box-shadow 0.2s; }
+        input:focus { border-color: #15803d; background-color: #ffffff; box-shadow: 0 0 0 3px rgba(21, 128, 61, 0.15); }
+        .dependents-box { background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 16px; margin: 20px 0; }
+        .dependents-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .dependents-header span { font-size: 13px; font-weight: 600; color: #166534; }
+        .badge-count { background-color: #15803d; color: #ffffff; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 12px; }
+        .filho-item { background: #ffffff; border: 1px solid #dcfce7; border-radius: 10px; padding: 12px; margin-bottom: 10px; }
+        .filho-title { font-size: 11px; font-weight: 700; color: #15803d; text-transform: uppercase; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .btn-remove { color: #dc2626; background: none; border: none; font-size: 12px; cursor: pointer; font-weight: 600; }
+        .filho-item input { margin-bottom: 8px; background-color: #eef2ff; }
+        .filho-item input:last-child { margin-bottom: 0; }
+        .btn-add-filho { width: 100%; padding: 10px; background: #ffffff; border: 1.5px dashed #86efac; border-radius: 8px; color: #15803d; font-size: 13px; font-weight: 600; cursor: pointer; transition: background-color 0.2s; }
+        .btn-add-filho:hover { background-color: #dcfce7; }
+        .btn-submit { width: 100%; padding: 14px; font-size: 15px; font-weight: 600; color: #ffffff; background-color: #15803d; border: none; border-radius: 10px; cursor: pointer; transition: background-color 0.2s; margin-top: 8px; }
+        .btn-submit:hover { background-color: #166534; }
+        .btn-submit:disabled { background-color: #86efac; cursor: not-allowed; }
+        .footer-link { text-align: center; margin-top: 18px; font-size: 13px; color: #6b7280; }
+        .footer-link a { color: #15803d; font-weight: 600; text-decoration: none; }
+        .footer-link a:hover { text-decoration: underline; }
+        .alert { padding: 12px; border-radius: 8px; font-size: 13px; margin-bottom: 16px; display: none; }
+        .alert-erro { background-color: #fee2e2; color: #b91c1c; border: 1px solid #fecaca; }
+        .alert-sucesso { background-color: #dcfce7; color: #15803d; border: 1px solid #bbf7d0; }
     </style>
 </head>
 <body>
-
+<div class="card">
 <div class="card">
     <div class="header">
         <div class="logo-box">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="4" y="10" width="16" height="11" rx="2" ry="2"></rect>
-                <path d="M8 10V7a4 4 0 0 1 8 0v3"></path>
-                <circle cx="12" cy="15" r="1"></circle>
-            </svg>
+            <img src="../assets/img/logotipo.jpeg" alt="Logotipo Banco EEP">
         </div>
-        <h1>EEP</h1>
-        <p>Banco Escolar • Cadastro de Responsável</p>
+        <h1>Banco EEP</h1>
+        <p>O banco do ecossistema escolar</p>
     </div>
+
 
     <div id="alert-box" class="alert"></div>
 
@@ -373,8 +189,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <label for="telefone">Telefone / WhatsApp</label>
             <input type="text" id="telefone" placeholder="(11) 99999-9999" maxlength="15" required>
         </div>
-
-        <!-- Seção de Dependentes / Filhos -->
         <div class="dependents-box">
             <div class="dependents-header">
                 <span>Dependentes / Filhos Vinculados</span>
@@ -409,8 +223,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         Já tem uma conta? <a href="login-responsavel.php">Faça login aqui</a>
     </div>
 </div>
+
 <script>
-    // 1. Máscara automática de CPF (000.000.000-00)
     document.getElementById('cpf').addEventListener('input', function(e) {
         let v = e.target.value.replace(/\D/g, '').slice(0, 11);
         v = v.replace(/(\d{3})(\d)/, '$1.$2');
@@ -419,7 +233,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         e.target.value = v;
     });
 
-    // 2. Máscara automática de Telefone/WhatsApp ((11) 99999-9999)
     document.getElementById('telefone').addEventListener('input', function(e) {
         let v = e.target.value.replace(/\D/g, '').slice(0, 11);
         v = v.replace(/^(\d{2})(\d)/g, '($1) $2');
@@ -427,7 +240,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         e.target.value = v;
     });
 
-    // 3. Controle dinâmico de Dependentes / Filhos
     const listaFilhos = document.getElementById('lista-filhos');
     const contadorFilhos = document.getElementById('contador-filhos');
 
@@ -455,9 +267,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         atualizarContagem();
     });
 
-    // 4. Envio do Formulário para o PHP no XAMPP
     document.getElementById('form-cadastro').addEventListener('submit', async function(e) {
         e.preventDefault();
+
         const alertBox = document.getElementById('alert-box');
         alertBox.style.display = 'none';
 
@@ -471,7 +283,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             return;
         }
 
-        // Coleta todos os filhos adicionados na tela
         const filhos = [];
         document.querySelectorAll('.filho-item').forEach(item => {
             filhos.push({
@@ -498,6 +309,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
 
             const data = await res.json();
+
             alertBox.textContent = data.mensagem;
             alertBox.className = `alert alert-${data.status}`;
             alertBox.style.display = 'block';
@@ -505,8 +317,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (data.status === 'sucesso') {
                 document.getElementById('form-cadastro').reset();
                 setTimeout(() => {
-                    window.location.href = 'login.php';
-                }, 2000);
+                    window.location.href = 'login-responsavel.php';
+                }, 1500);
             }
         } catch (err) {
             alertBox.textContent = 'Erro de conexão com o XAMPP. Verifique se o Apache e o MySQL estão ativos.';
@@ -518,7 +330,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     });
 </script>
-
 </body>
 </html>
+
 

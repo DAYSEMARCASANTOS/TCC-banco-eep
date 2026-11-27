@@ -1,103 +1,104 @@
 <?php
-$servidor = "localhost";
-$usuario  = "root";
-$senha_db = "";
-$banco    = "banco-eep";
+session_start();
+require_once '../config/conexao.php';
 
-$conexao = new mysqli($servidor, $usuario, $senha_db, $banco);
-if ($conexao->connect_error) {
-    die("Falha na conexão com o banco: " . $conexao->connect_error);
-}
-$conexao->set_charset("utf8mb4");
-
-// Garante que a coluna 'foto' exista na tabela estudantes
-$check_col = $conexao->query("SHOW COLUMNS FROM estudantes LIKE 'foto'");
-if ($check_col && $check_col->num_rows === 0) {
-    $conexao->query("ALTER TABLE estudantes ADD COLUMN foto VARCHAR(255) DEFAULT NULL");
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header("Location: ../responsavel/cadastro-responsavel.php");
+    exit();
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $nome_completo = trim($_POST['nome_completo'] ?? '');
+// Função auxiliar para padronizar CPF e telefone apenas com números
+function limparNumeros($valor) {
+    return preg_replace('/\D/', '', $valor);
+}
 
-    if (isset($_POST['responsavel']) && is_array($_POST['responsavel'])) {
-        $lista_limpa = array_filter(array_map('trim', $_POST['responsavel']));
-        $responsavel = implode(', ', $lista_limpa);
-    } else {
-        $responsavel = trim($_POST['responsavel'] ?? '');
-    }
+$nome            = trim($_POST['nome'] ?? '');
+$cpf             = limparNumeros($_POST['cpf'] ?? '');
+$telefone        = limparNumeros($_POST['telefone'] ?? '');
+$senha           = $_POST['senha'] ?? '';
+$confirmar_senha = $_POST['confirmar_senha'] ?? '';
 
-    $escola    = trim($_POST['escola'] ?? '');
-    $cpf       = trim($_POST['cpf'] ?? '');
-    $matricula = trim($_POST['matricula'] ?? '');
-    $senha     = trim($_POST['senha'] ?? '');
+$filhos_nomes = $_POST['filho_nome'] ?? [];
+$filhos_cpfs  = $_POST['filho_cpf'] ?? [];
 
-    $saldo_inicial  = 47.50;
-    $limite_inicial = 20.00;
+// 1. Validações rápidas
+if (empty($nome) || strlen($cpf) !== 11 || strlen($telefone) < 10 || strlen($senha) < 6) {
+    echo "<script>alert('Verifique os dados: CPF deve ter 11 dígitos e senha no mínimo 6 caracteres.'); history.back();</script>";
+    exit();
+}
 
-    // 1. Verifica duplicidade de RA ou CPF
-    $verifica = $conexao->prepare("SELECT id FROM estudantes WHERE ra = ? OR cpf = ?");
-    $verifica->bind_param("ss", $matricula, $cpf);
-    $verifica->execute();
-    $verifica->store_result();
+if ($senha !== $confirmar_senha) {
+    echo "<script>alert('As senhas não coincidem!'); history.back();</script>";
+    exit();
+}
 
-    if ($verifica->num_rows > 0) {
-        echo "<script>alert('Este RA ou CPF já está cadastrado! Tente fazer login.'); window.location.href='login-estudante.php';</script>";
-        $verifica->close();
-        $conexao->close();
-        exit;
-    }
-    $verifica->close();
+// 2. Filtra e remove filhos duplicados antes de abrir transação no banco
+$filhosValidos = [];
+$cpfsVistos = [];
 
-    // 2. Processa a foto (Galeria OU Webcam)
-    $caminho_foto = null;
-    $pasta_uploads = "uploads/";
-    if (!is_dir($pasta_uploads)) {
-        mkdir($pasta_uploads, 0777, true);
-    }
+for ($i = 0; $i < count($filhos_nomes); $i++) {
+    $nomeFilho = trim($filhos_nomes[$i] ?? '');
+    $cpfFilho  = limparNumeros($filhos_cpfs[$i] ?? '');
 
-    // Caso A: Enviou arquivo pela Galeria / Drive
-    if (isset($_FILES['foto']) && $_FILES['foto']['error'] === UPLOAD_ERR_OK) {
-        $ext = strtolower(pathinfo($_FILES['foto']['name'], PATHINFO_EXTENSION));
-        $permitidas = ['jpg', 'jpeg', 'png', 'webp'];
-        if (in_array($ext, $permitidas)) {
-            $nome_arquivo = "aluno_" . preg_replace('/\D/', '', $matricula) . "_" . time() . "." . $ext;
-            $destino = $pasta_uploads . $nome_arquivo;
-            if (move_uploaded_file($_FILES['foto']['tmp_name'], $destino)) {
-                $caminho_foto = $destino;
-            }
+    if (!empty($nomeFilho) && strlen($cpfFilho) === 11 && !in_array($cpfFilho, $cpfsVistos)) {
+        if ($cpfFilho === $cpf) {
+            echo "<script>alert('O CPF do filho não pode ser igual ao do responsável.'); history.back();</script>";
+            exit();
         }
+        $cpfsVistos[] = $cpfFilho;
+        $filhosValidos[] = ['nome' => $nomeFilho, 'cpf' => $cpfFilho];
     }
-    // Caso B: Tirou foto na hora pela Câmera (Base64)
-    elseif (!empty($_POST['foto_camera'])) {
-        $dados_img = $_POST['foto_camera'];
-        if (preg_match('/^data:image\/(\w+);base64,/', $dados_img, $tipo)) {
-            $dados_img = substr($dados_img, strpos($dados_img, ',') + 1);
-            $dados_binarios = base64_decode($dados_img);
-            if ($dados_binarios !== false) {
-                $nome_arquivo = "aluno_" . preg_replace('/\D/', '', $matricula) . "_" . time() . ".jpg";
-                $destino = $pasta_uploads . $nome_arquivo;
-                if (file_put_contents($destino, $dados_binarios)) {
-                    $caminho_foto = $destino;
-                }
-            }
-        }
-    }
-
-    // 3. Insere o estudante com o caminho da foto
-    $stmt = $conexao->prepare("INSERT INTO estudantes (nome_completo, responsavel, escola, cpf, ra, senha, saldo, limite_diario, foto) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    $stmt->bind_param("ssssssdds", $nome_completo, $responsavel, $escola, $cpf, $matricula, $senha, $saldo_inicial, $limite_inicial, $caminho_foto);
-
-    if ($stmt->execute()) {
-        echo "<script>alert('Conta criada com sucesso! Faça login com seu RA e senha.'); window.location.href='login-estudante.php';</script>";
-        exit;
-    } else {
-        echo "<script>alert('Erro ao salvar no banco: " . addslashes($stmt->error) . "'); window.history.back();</script>";
-    }
-
-    $stmt->close();
 }
 
-$conexao->close();
-?>
+if (empty($filhosValidos)) {
+    echo "<script>alert('Adicione pelo menos 1 filho com nome e CPF válidos (11 dígitos).'); history.back();</script>";
+    exit();
+}
+
+try {
+    // 3. Verifica se o responsável já existe
+    $stmtVerifica = $pdo->prepare("SELECT id FROM responsaveis WHERE cpf = ? LIMIT 1");
+    $stmtVerifica->execute([$cpf]);
+
+    if ($stmtVerifica->fetch()) {
+        echo "<script>alert('Este CPF já possui cadastro! Faça login.'); window.location.href='../responsavel/login-responsavel.php';</script>";
+        exit();
+    }
+
+    // 4. Grava tudo em lote dentro de uma transação
+    $pdo->beginTransaction();
+
+    $senhaHash = password_hash($senha, PASSWORD_DEFAULT);
+
+    $stmtResp = $pdo->prepare("INSERT INTO responsaveis (nome_completo, cpf, telefone, senha) VALUES (?, ?, ?, ?)");
+
+    $stmtResp->execute([$nome, $cpf, $telefone, $senhaHash]);
+    $responsavel_id = $pdo->lastInsertId();
+
+    $stmtFilho = $pdo->prepare("INSERT INTO responsavel_filhos (responsavel_id, nome_filho, cpf_filho) VALUES (?, ?, ?)");
+    foreach ($filhosValidos as $filho) {
+        $stmtFilho->execute([$responsavel_id, $filho['nome'], $filho['cpf']]);
+    }
+
+    $pdo->commit();
+
+    // Login automático após cadastro
+    $_SESSION['responsavel_id']   = $responsavel_id;
+    $_SESSION['responsavel_nome'] = $nome;
+
+    echo "<script>
+        alert('Conta criada com " . count($filhosValidos) . " filho(s) vinculado(s)!');
+        window.location.href = '../responsavel/painel-responsavel.php';
+    </script>";
+    exit();
+
+} catch (Exception $e) {
+    if ($pdo->inTransaction()) {
+        $pdo->rollBack();
+    }
+    echo "<script>alert('Erro ao salvar cadastro: " . addslashes($e->getMessage()) . "'); history.back();</script>";
+    exit();
+}
+
 
 

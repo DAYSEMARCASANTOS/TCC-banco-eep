@@ -142,22 +142,20 @@ $conexao->close();
             <div class="alert-error"><?= htmlspecialchars($erro) ?></div>
         <?php endif; ?>
 
-        <form method="POST">
-            <div class="form-group">
-                <label for="cpf">CPF do Responsável</label>
-                <input type="text" id="cpf" name="cpf" placeholder="000.000.000-00" maxlength="14" required>
-            </div>
+    <form action="../actions/processar-login-responsavel.php" method="POST">
+         <div class="form-group">
+        <label for="cpf">CPF do Responsável</label>
+        <input type="text" id="cpf" name="cpf" placeholder="Digite seu CPF" required>
+        </div>
+    
+        <div class="form-group">
+        <label for="senha">Senha</label>
+        <input type="password" id="senha" name="senha" placeholder="Sua senha" required>
+        </div>
 
-            <div class="form-group">
-                <label for="senha">Senha</label>
-                <div class="password-wrapper">
-                    <input type="password" id="senha" name="senha" placeholder="Sua senha" required>
-                    <button type="button" class="toggle-password" onclick="alternarSenha()">👁️</button>
-                </div>
-            </div>
+        <button type="submit" class="btn-entrar">Entrar</button>
+    </form>
 
-            <button type="submit" class="btn-entrar">Entrar</button>
-        </form>
 
         <div class="footer-links">
             <div>Não tem cadastro ainda? <a href="cadastro-responsavel.php">Faça cadastro aqui</a></div>
