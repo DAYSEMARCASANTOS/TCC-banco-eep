@@ -146,7 +146,7 @@
                 E
             </div>
 
-                            <a  href="login.php" class="bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1 rounded-full border border-blue-100">ACESSAR</a>
+                            <a  href="estudante/login-estudante.php" class="bg-blue-50 text-blue-700 text-xs font-bold px-3 py-1 rounded-full border border-blue-100">ACESSAR</a>
                         </div>
                         <h3 class="text-xl font-bold text-slate-800 mb-2">Estudante</h3>
                         <p class="text-slate-600 text-sm leading-relaxed">
@@ -163,7 +163,7 @@
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center text-2xl shadow-inner">R</div>
-                            <a href="login.php" class="bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full border border-emerald-100 hover:bg-emerald-100 transition">ACESSAR</a>
+                            <a href="responsavel/login-responsavel.php" class="bg-emerald-50 text-emerald-700 text-xs font-bold px-3 py-1 rounded-full border border-emerald-100 hover:bg-emerald-100 transition">ACESSAR</a>
                         </div>
                         <h3 class="text-xl font-bold text-slate-800 mb-2">Responsável</h3>
                         <p class="text-slate-600 text-sm leading-relaxed">
@@ -180,7 +180,7 @@
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-12 h-12 rounded-xl bg-pink-50 flex items-center justify-center text-2xl shadow-inner">F</div>
-                            <a href="login.php" class="bg-purple-50 text-purple-700 text-xs font-bold px-3 py-1 rounded-full border border-purple-100">ACESSAR</a>
+                            <a href="funcionario/login-funcionario.php" class="bg-purple-50 text-purple-700 text-xs font-bold px-3 py-1 rounded-full border border-purple-100">ACESSAR</a>
                         </div>
                         <h3 class="text-xl font-bold text-slate-800 mb-2">Funcionários</h3>
                         <p class="text-slate-600 text-sm leading-relaxed">
@@ -197,7 +197,7 @@
                     <div>
                         <div class="flex items-center justify-between mb-4">
                             <div class="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center text-2xl shadow-inner">V</div>
-                            <a href="login.php" class="bg-orange-50 text-orange-700 text-xs font-bold px-3 py-1 rounded-full border border-orange-100">ACESSAR</a>
+                            <a href="vendedor/login-vendedor.php" class="bg-orange-50 text-orange-700 text-xs font-bold px-3 py-1 rounded-full border border-orange-100">ACESSAR</a>
                         </div>
                         <h3 class="text-xl font-bold text-slate-800 mb-2">Vendedor</h3>
                         <p class="text-slate-600 text-sm leading-relaxed">
@@ -216,7 +216,7 @@
                 <div>
                     <div class="flex items-center justify-between mb-4">
                         <div class="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center text-2xl shadow-inner">ES</div>
-                        <a href="login.php" class="bg-indigo-50 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full border border-indigo-100">ACESSAR</a>
+                        <a href="gestor/login-gestor.php" class="bg-indigo-50 text-indigo-700 text-xs font-bold px-3 py-1 rounded-full border border-indigo-100">ACESSAR</a>
                     </div>
                     <h3 class="text-xl font-bold text-slate-800 mb-2">Escola/Gestão</h3>
                     <p class="text-slate-600 text-sm leading-relaxed">
@@ -307,19 +307,19 @@
                     <div class="space-y-4">
                         <div class="flex items-center space-x-3 text-slate-700">
                             <i class="fa-solid.fa-circle-check text-emerald-500 text-lg"></i>
-                            <span class="font-medium text-sm">Sem dinheiro físico = mais segurança</span>
+                            <span class="font-medium text-sm">- Sem dinheiro físico = mais segurança</span>
                         </div>
                         <div class="flex items-center space-x-3 text-slate-700">
                             <i class="fa-solid.fa-circle-check text-emerald-500 text-lg"></i>
-                            <span class="font-medium text-sm">Filas menores no intervalo</span>
+                            <span class="font-medium text-sm">- Filas menores no intervalo</span>
                         </div>
                         <div class="flex items-center space-x-3 text-slate-700">
                             <i class="fa-solid.fa-circle-check text-emerald-500 text-lg"></i>
-                            <span class="font-medium text-sm">Extrato detalhado de cada compra</span>
+                            <span class="font-medium text-sm">- Extrato detalhado de cada compra</span>
                         </div>
                         <div class="flex items-center space-x-3 text-slate-700">
                             <i class="fa-solid.fa-circle-check text-emerald-500 text-lg"></i>
-                            <span class="font-medium text-sm">Metas de poupança para alunos</span>
+                            <span class="font-medium text-sm">- Metas de poupança para alunos</span>
                         </div>
                        
                     </div>
